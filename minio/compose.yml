@@ -1,0 +1,29 @@
+services:
+  minio:
+    image: "elestio/minio:latest"
+    container_name: minio
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=root
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_DEFAULT_BUCKET_HOSTNAME=default
+    command: server --address ":9000" --console-address ":9001" /data
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    volumes:
+      - ./data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - minio
+
+networks:
+  minio:
+    driver: bridge
